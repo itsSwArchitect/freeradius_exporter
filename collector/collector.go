@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/bvantagelimited/freeradius_exporter/client"
+	"github.com/itsSwArchitect/freeradius_exporter/client"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

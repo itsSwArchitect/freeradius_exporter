@@ -1,4 +1,4 @@
-module github.com/bvantagelimited/freeradius_exporter
+module github.com/itsSwArchitect/freeradius_exporter
 
 go 1.21
 
