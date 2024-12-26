@@ -4,9 +4,11 @@ Prometheus exporter for [FreeRADIUS](https://freeradius.org) metrics.
 
 Supports FreeRADIUS 3.0.x.
 
-### Installation
 
+### Installation of Original Exporter
     go install github.com/bvantagelimited/freeradius_exporter@latest
+### Installation modified for my own use
+    go install github.com/itsSwArchitect/freeradius_exporter@latest
 
 ### Requirements
 
