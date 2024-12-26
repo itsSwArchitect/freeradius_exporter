@@ -322,7 +322,21 @@ func (f *FreeRADIUSClient) Stats() ([]prometheus.Metric, error) {
 			log.Println(err)
 		}
 
+		// if stats.Access.Requests, err = freeradius.GetInt(response, freeradius.TotalAccessRequests); err == nil {
+		// 	allStats = append(allStats, prometheus.MustNewConstMetric(f.metrics["freeradius_total_access_requests"], prometheus.CounterValue, float64(stats.Access.Requests), p.address))
+		// } else if err != nil && err != radius.ErrNoAttribute {
+		// 	log.Println(err)
+		// }
 		if stats.Access.Requests, err = freeradius.GetInt(response, freeradius.TotalAccessRequests); err == nil {
+			// Decrease the value by 1 with each request
+			stats.Access.Requests = stats.Access.Requests - 1
+
+			// Ensure the value doesn't go below 0
+			if stats.Access.Requests < 0 {
+				stats.Access.Requests = 0
+			}
+
+			// Append the metric with the updated value
 			allStats = append(allStats, prometheus.MustNewConstMetric(f.metrics["freeradius_total_access_requests"], prometheus.CounterValue, float64(stats.Access.Requests), p.address))
 		} else if err != nil && err != radius.ErrNoAttribute {
 			log.Println(err)
