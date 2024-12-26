@@ -327,17 +327,28 @@ func (f *FreeRADIUSClient) Stats() ([]prometheus.Metric, error) {
 		// } else if err != nil && err != radius.ErrNoAttribute {
 		// 	log.Println(err)
 		// }
-		if stats.Access.Requests, err = freeradius.GetInt(response, freeradius.TotalAccessRequests); err == nil {
-			// Decrease the value by 1 with each request
-			stats.Access.Requests = stats.Access.Requests - 1
+		var previousTotalRequests uint32
 
-			// Ensure the value doesn't go below 0
-			if stats.Access.Requests < 0 {
-				stats.Access.Requests = 0
+		if stats.Access.Requests, err = freeradius.GetInt(response, freeradius.TotalAccessRequests); err == nil {
+			// Calculate the delta (difference between current and previous value)
+			delta := stats.Access.Requests - previousTotalRequests
+
+			// Update the previous value for the next scrape
+			previousTotalRequests = stats.Access.Requests
+
+			// Ensure delta is non-negative (counter might wrap around or reset)
+			if delta < 0 {
+				delta = 0
 			}
+
+			// Set stats.Access.Requests to the delta
+			stats.Access.Requests = delta
 
 			// Append the metric with the updated value
 			allStats = append(allStats, prometheus.MustNewConstMetric(f.metrics["freeradius_total_access_requests"], prometheus.CounterValue, float64(stats.Access.Requests), p.address))
+
+			// Optional: Print the current value for debugging
+			println(stats.Access.Requests)
 		} else if err != nil && err != radius.ErrNoAttribute {
 			log.Println(err)
 		}
